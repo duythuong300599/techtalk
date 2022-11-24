@@ -1,9 +1,13 @@
-import { Button } from 'antd';
-import React from 'react';
+import { Avatar, Button } from 'antd';
+import React, { useState } from 'react';
 import { useUser } from '../../hooks/useUser';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
+import UpLoadImg from '../UpLoadImg';
+
+import styles from './styles.module.scss';
+import ModalEditUser from '../EditUser';
 
 interface DataType {
   name: string;
@@ -15,23 +19,41 @@ interface DataType {
 }
 
 function HomePage() {
+  const [itemEdit, setItemEdit] = useState<any>(null);
+  const [visibleModal, setVisibleModal] = useState(false);
   const { data } = useUser();
   const dataSource = data?.data ?? [];
 
+  const handleEditUser = (record: any) => {
+    setItemEdit(record);
+    setVisibleModal(true);
+  }
+
   const columns: ColumnsType<DataType> = [
     {
+      key: 'avatar',
+      title: 'Avatar',
+      render: (_: any, record: any) => {
+        return (<Avatar src={record.avatar} ></Avatar>)
+      }
+    },
+    {
+      key: 'name',
       title: 'Name',
       dataIndex: 'name',
     },
     {
+      key: 'username',
       title: 'UserName',
       dataIndex: 'username',
     },
     {
+      key: 'address',
       title: 'Address',
       dataIndex: 'address',
     },
     {
+      key: 'is_active',
       title: 'Active',
       dataIndex: 'is_active',
       render: (_: any, record: any) => {
@@ -43,17 +65,24 @@ function HomePage() {
       }
     },
     {
+      key: 'email',
       title: 'Email',
       dataIndex: 'email',
     },
     {
-      title: 'Avatar',
-      dataIndex: 'avatar',
+      key: 'edit',
+      title: '',
+      dataIndex: 'edit',
+      render: (_: any, record: any) => {
+        return (<EditOutlined onClick={() => handleEditUser(record)} />)
+      }
     },
   ];
   return (
-    <div>
-      <Table columns={columns} dataSource={dataSource} />
+    <div className={styles.tableUser}>
+      <h1 className={styles.headerTable}>List User</h1>
+      <Table className={styles.table} columns={columns} dataSource={dataSource} />
+      <ModalEditUser open={visibleModal} record={itemEdit} setVisibleModal={setVisibleModal} />
     </div>
   )
 };
